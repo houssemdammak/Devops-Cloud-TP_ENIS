@@ -1,4 +1,3 @@
-# Terraform block specifying required providers
 terraform {
   required_providers {
     aws = {
@@ -15,29 +14,31 @@ terraform {
     }
   }
   backend "s3" {
-    bucket         = "custom-terraform-state-bucket-123456-1c13b9b9" # Replace with your S3 bucket name
+    bucket         = "custom-terraform-state-bucket-123456-6052d557" # Replace with your S3 bucket name
     key            = "aws-backend/terraform.tfstate"                 # Location of the state file in the bucket
     region         = "us-east-1"                                     # AWS region
     dynamodb_table = "custom-terraform-state-locks-123456"           # Replace with your DynamoDB table name
     encrypt        = true                                            # Enables encryption for the state file
   }
-}
 
+
+}
 # AWS provider configuration
 provider "aws" {
   region = "us-east-1"
-}
 
-# Generate a random suffix for the S3 bucket name to ensure uniqueness
+
+}
 resource "random_id" "bucket_suffix" {
   byte_length = 4
 }
 
-# S3 bucket for storing Terraform state
+#to ensure the uniqueness of the bucket name
 resource "aws_s3_bucket" "terraform_state" {
   bucket        = "${var.s3_bucket_name}-${random_id.bucket_suffix.hex}"
   force_destroy = true
 }
+
 
 # Enable versioning for the S3 bucket
 resource "aws_s3_bucket_versioning" "terraform_bucket_versioning" {
@@ -57,7 +58,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_c
   }
 }
 
-# DynamoDB table for state locking
+
 resource "aws_dynamodb_table" "terraform_locks" {
   name         = var.dynamodb_table_name
   billing_mode = "PAY_PER_REQUEST"
@@ -68,3 +69,4 @@ resource "aws_dynamodb_table" "terraform_locks" {
     type = "S"
   }
 }
+
